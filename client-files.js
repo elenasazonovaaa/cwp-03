@@ -2,7 +2,11 @@ const net = require('net');
 const fs = require('fs');
 const path = require('path');
 
-const pathFor = process.argv[2];
+let pathFor = [];
+for(let r = 2; r < process.argv.length; r++)
+{
+    pathFor[r-2] = process.argv[r];
+}
 const connect = {host: "127.0.0.1", port: 3001};
 let files = [];
 
@@ -47,14 +51,17 @@ function sendFiles() {
 }
 
 function readFiles() {
-    fs.readdir(pathFor, function (err, items) {
-        if (!err) {
-            for (let i = 0; i < items.length; i++) {
-                let filePath = path.join(pathFor, items[i]);
-                fs.stat(filePath, function (err, stat) {
-                    if (!err && stat.isFile()) files.push(filePath);
-                });
+    for(let k = 0; k < pathFor.length; k++)
+    {
+        fs.readdir(pathFor[k], function (err, items) {
+            if (!err) {
+                for (let i = 0; i < items.length; i++) {
+                    let filePath = path.join(pathFor[k], items[i]);
+                    fs.stat(filePath, function (err, stat) {
+                        if (!err && stat.isFile()) files.push(filePath);
+                    });
+                }
             }
-        }
-    });
+        });
+    }
 }

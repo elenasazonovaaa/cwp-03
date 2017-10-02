@@ -33,6 +33,7 @@ const server = net.createServer(function (client) {
             }
             if (data === 'FILES') {
                 client.id = Date.now() + seed++;
+                fs.mkdir(process.env.pathSave+'\\'+client.id,()=>{});
                 Clients[client.id] = data;
                 buffFile[client.id] = [];
                 buffName[client.id] = [];
@@ -106,8 +107,9 @@ function getJSON() {
 function createFile(id) {
     let fileData = Buffer.concat(buffFile[id]);
     let fileName = Buffer.concat(buffName[id]).toString().split('####')[0];
+    if(fileData.length === 0) fileData = Buffer.concat(buffName[id]).toString().split('####')[1];
     console.log(`name ${fileName} -- ${fileData.length} `);
-    fs.writeFile(process.env.pathSave + '\\' + fileName, fileData , function (err) {
+    fs.writeFile(process.env.pathSave + '\\' + id + '\\' + fileName, fileData , function (err) {
             if (err)
                 console.error(err);
         }
