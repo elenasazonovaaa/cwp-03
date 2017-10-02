@@ -85,7 +85,7 @@ const server = net.createServer(function (client) {
         });
     })
 ;
-
+server.maxConnections = process.env.maxClients;
 server.listen(connect, () => {
     console.log(`Server listening on localhost:${connect.host}:${connect.port}`);
     console.log(process.env.pathSave.toString());
