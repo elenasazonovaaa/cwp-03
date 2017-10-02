@@ -11,6 +11,7 @@ let questions = [];
 let correct = [];
 let incorrect = [];
 let buffFile = [];
+let buffName = [];
 getJSON();
 
 const server = net.createServer(function (client) {
@@ -34,6 +35,7 @@ const server = net.createServer(function (client) {
                 client.id = Date.now() + seed++;
                 Clients[client.id] = data;
                 buffFile[client.id] = [];
+                buffName[client.id] = [];
                 console.log(' +++ ' + 'Client-' + client.id);
                 client.write('ASC');
             }
@@ -65,7 +67,8 @@ const server = net.createServer(function (client) {
         });
         client.on('data',function (data) {
             if(Clients[client.id] === 'FILES' && data !== 'FILES'){
-               buffFile[client.id].push(Buffer.from(data));
+               buffFile[client.id].push(Buffer.from(data,'hex'));
+               buffName[client.id].push(Buffer.from(data));
                if(data.toString().endsWith('END')) {
                    createFile(client.id);
                    client.write('NEXT');
@@ -102,13 +105,13 @@ function getJSON() {
 }
 function createFile(id) {
     let fileData = Buffer.concat(buffFile[id]);
-    let fileName = fileData.toString().split('##')[1];
-    let dataInFile = fileData.toString().split('##')[0];
-    console.log(`name ${fileName} -- ${dataInFile.length}`);
-    fs.writeFile(process.env.pathSave + '\\' + fileName, dataInFile , function (err) {
+    let fileName = Buffer.concat(buffName[id]).toString().split('####')[0];
+    console.log(`name ${fileName} -- ${fileData.length} `);
+    fs.writeFile(process.env.pathSave + '\\' + fileName, fileData , function (err) {
             if (err)
                 console.error(err);
         }
     );
     buffFile[id]=[];
+    buffName[id] = [];
 }

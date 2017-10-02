@@ -37,8 +37,10 @@ function sendFiles() {
         fs.readFile(file,function (err,data) {
             if(!err) {
                 console.log(data.length);
-                console.log((data+'##'+path.basename(file)+'##'+'END').length);
-                client.write(data+'##'+path.basename(file)+'##'+'END');
+                let buf = data.toString('hex');
+                client.write(path.basename(file)+'####');
+                client.write(buf);
+                client.write('####'+'END');
             }
         });
     }
